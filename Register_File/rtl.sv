@@ -1,0 +1,27 @@
+module register_file(
+    input  logic [4:0]  rs1_sel, rs2_sel,
+    input  logic        reg_write,
+    input  logic        clk,
+    input  logic        reset,
+    input  logic [31:0] wb_data,
+    input  logic [4:0]  rd_sel,
+    output logic [31:0] rs1_data, rs2_data
+);
+
+    logic [31:0] regs [31:0];
+    integer i;
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            for (i = 0; i < 32; i = i + 1) begin
+                regs[i] <= 32'd0;
+            end
+        end else if (reg_write && (rd_sel != 5'd0)) begin
+            regs[rd_sel] <= wb_data;
+        end
+    end
+
+    assign rs1_data = (rs1_sel == 5'd0) ? 32'd0 : regs[rs1_sel];
+    assign rs2_data = (rs2_sel == 5'd0) ? 32'd0 : regs[rs2_sel];
+
+endmodule
